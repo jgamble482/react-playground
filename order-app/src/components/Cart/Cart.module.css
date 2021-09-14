@@ -28,6 +28,10 @@
     border-radius: 25px;
     margin-left: 1rem;
   }
+
+  .actions button:disabled {
+    background-color: darkgray;
+  }
   
   .actions button:hover,
   .actions button:active {
