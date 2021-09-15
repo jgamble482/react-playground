@@ -15,30 +15,49 @@ const defaultState = {
 const cartReducer = (state, action) => {
   switch (action.type) {
     case "ADD_ITEM":
-      const existingIndex = state.items.findIndex(item => item.id === action.payload.id);
+      const existingIndex = state.items.findIndex(
+        (item) => item.id === action.payload.id
+      );
       const existingItem = state.items[existingIndex];
       let updatedItems;
       let updatedItem;
-      if(existingItem) {
+      if (existingItem) {
         updatedItem = {
-            ...existingItem,
-            amount: existingItem.amount + action.payload.amount
-        }
+          ...existingItem,
+          amount: existingItem.amount + action.payload.amount,
+        };
         updatedItems = [...state.items];
         updatedItems[existingIndex] = updatedItem;
       } else {
-          updatedItems = [...state.items, action.payload]
+        updatedItems = [...state.items, action.payload];
       }
       return {
         items: updatedItems,
-        totalAmount: state.totalAmount + (action.payload.price * action.payload.amount),
+        totalAmount:
+          state.totalAmount + action.payload.price * action.payload.amount,
       };
-    case "REMOVE_ITEM":
-      const arr = state.items.filter(item => item.id === action.payload);
-      return {
-          items: arr,
-          ...state
+    case "REMOVE_ITEM": {
+      const existingIndex = state.items.findIndex(
+        (item) => item.id === action.payload
+      );
+      const existingItem = state.items[existingIndex];
+      const updatedTotalAmount = state.totalAmount - existingItem.price;
+      let updatedItems;
+      if (existingItem.amount === 1) {
+        updatedItems = state.items.filter((item) => item.id !== action.payload);
+      } else {
+        const updatedItem = {
+          ...existingItem,
+          amount: existingItem.amount - 1,
+        };
+        updatedItems = [...state.items];
+        updatedItems[existingIndex] = updatedItem;
       }
+      return {
+        items: updatedItems,
+        totalAmount: updatedTotalAmount,
+      };
+    }
     default:
       break;
   }
