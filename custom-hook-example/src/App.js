@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Tasks from "./components/Tasks/Tasks";
 import NewTask from "./components/NewTask/NewTask";
@@ -7,23 +7,29 @@ import useHttp from "./hooks/useHttp";
 function App() {
   const [tasks, setTasks] = useState([]);
 
-  const transformTasks = useCallback((taskObj) => {
-    const loadedTasks = [];
-    for (const taskKey in taskObj) {
-      loadedTasks.push({ id: taskKey, text: taskObj[taskKey].text });
-    }
-    setTasks([...loadedTasks]);
-  }, []);
-
-  const { isLoading, error, sendRequest: fetchTasks } = useHttp(transformTasks);
+  const { isLoading, error, sendRequest: fetchTasks } = useHttp();
 
   useEffect(() => {
-    fetchTasks({ url: "https://react-db-9f00d-default-rtdb.firebaseio.com/tasks.json" });
+    const transformTasks = (taskObj) => {
+      const loadedTasks = [];
+      for (const taskKey in taskObj) {
+        loadedTasks.push({ id: taskKey, text: taskObj[taskKey].text });
+      }
+      setTasks(loadedTasks);
+    };
+    fetchTasks(
+      { url: "https://react-db-9f00d-default-rtdb.firebaseio.com/tasks.json" },
+      transformTasks
+    );
   }, [fetchTasks]);
 
-  const taskAddHandler = useCallback((task) => {
-    setTasks((prevTasks) => prevTasks.concat(task));
-  }, []);
+  const taskAddHandler = (task) => {
+    console.log('Task: ', task);
+    setTasks(prevTasks => {
+      const newTasks = prevTasks.concat(task);
+      return newTasks;
+    });
+  };
 
   return (
     <React.Fragment>
